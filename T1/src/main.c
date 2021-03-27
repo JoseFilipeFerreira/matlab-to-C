@@ -30,20 +30,27 @@ int main(int argc, char** argv) {
             size_t cost;
             size_t steps;
             rooms_mc(n, D, room, &cost, &steps);
-            fprintf(stderr, "MC -> steps: %zu; cost: %zu\n", steps, cost);
+            fprintf(stderr, "MC -> s: %zu, c: %zu\n", steps, cost);
             return 0;
         }
+    }
+
+    for (int i = 0; i < procs; i++) wait(NULL);
+    fprintf(stderr, "\n");
+
+
+    for (int i = 0; i < procs; i++) {
         if (!fork()) {
             int room[n / 2][2];
             size_t cost;
             size_t steps;
             rooms_sa(n, D, room, &cost, &steps);
-            fprintf(stderr, "SA -> steps: %zu; cost: %zu\n", steps, cost);
+            fprintf(stderr, "SA -> s: %zu, c: %zu\n", steps, cost);
             return 0;
         }
     }
-
-    for (int i = 0; i < procs * 2; i++) wait(NULL);
+    for (int i = 0; i < procs; i++) wait(NULL);
+    fprintf(stderr, "\n");
 
     for (int i = 0; i < n; i++) free(D[i]);
     free(D);
