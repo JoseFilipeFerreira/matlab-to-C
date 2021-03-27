@@ -1,0 +1,101 @@
+\documentclass[a4paper]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[portuguese]{babel}
+\usepackage{hyperref}
+\usepackage{a4wide}
+\hypersetup{pdftitle={AP - Rooms},
+pdfauthor={João Teixeira, José Ferreira},
+colorlinks=true,
+urlcolor=blue,
+linkcolor=black}
+\usepackage{subcaption}
+\usepackage{listings}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{appendix}
+\usepackage{tikz}
+\usepackage{authblk}
+\usepackage{bashful}
+\usepackage{verbatim}
+\usepackage{amssymb}
+\usepackage{multirow}
+\usepackage{mwe}
+\usepackage[parfill]{parskip}
+\usetikzlibrary{positioning,automata,decorations.markings}
+\AfterEndEnvironment{figure}{\noindent\ignorespaces}
+\AfterEndEnvironment{table}{\noindent\ignorespaces}
+
+\begin{document}
+
+\title{Algoritmos Paralelos\\Room Assignment Problem}
+\author{João Teixeira (A85504) \and José Filipe Ferreira (A83683)}
+\date{\today}
+
+\begin{center}
+    \begin{minipage}{0.75\linewidth}
+        \centering
+        \includegraphics[width=0.4\textwidth]{images/eng.jpeg}\par\vspace{1cm}
+        \vspace{1.5cm}
+        \href{https://www.uminho.pt/PT}
+        {\color{black}{\scshape\LARGE Universidade do Minho}} \par
+        \vspace{1cm}
+        \href{https://www.di.uminho.pt/}
+        {\color{black}{\scshape\Large Departamento de Informática}} \par
+        \vspace{1.5cm}
+        \maketitle
+    \end{minipage}
+\end{center}
+
+\tableofcontents
+
+\pagebreak
+
+\chapter{Introdução}
+O algoritmo escolhido para o projeto da unidade curricular de Computação
+Paralela e Distribuída foi o \textit{Bucket Sort}.
+
+Numa primeira fase do trabalho desenvolvemos uma versão sequencial do projeto e
+procedemos ao \textit{benchmarking} do programa resultante. Em seguida
+convertemos a implementação sequencial numa versão com utilização de memoria
+partilhada fazendo uso de \textit{OpenMP} e comparamos o resultado com a versão
+sequencial desenvolvida anteriormente.
+
+Nesta segunda fase desenvolvemos uma nova versao do \textit{bucket sort} fazendo
+uso de memoria distribuída com o \textit{OpenMPI} comparando os resultados do
+benchmarking deste algoritmo com os resultados obtidos na fase anterior.
+
+De notar que todos os benchmarks descritos foram efeutados em nós do tipo 642 do
+cluster \textit{SeARCH}, e todos os executáveis foram compilados o
+\textit{MPIcc} na versão 1.8.1 do \textit{OpenMPI}, utilizando a versão
+7.2.0 do \textit{gcc}, e com as flags \textit{-O3 -std=c11} para garantir
+a maior consistência entre os diferentes benchmarks. Na
+ausência de indicação, os benchmarks foram efetuados com um input de 100000000
+de elementos aleatórios, entre -1000 e 500000.
+
+\chapter{OpenMPI} \label{chap:ompi}
+
+\section{Descrição da Implementação}
+
+\section{Análise dos resultados}
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|c|c|}
+        \hline
+        Processes & Time(Seconds) \\ \hline
+        2         & 10,170775     \\ \hline
+        4         & 10,061176     \\ \hline
+        8         & 6,581753      \\ \hline
+        16        & 2,5495        \\ \hline
+        32        & 6,165742      \\ \hline
+    \end{tabular}
+    \caption{\label{tab:Times}Tempos de execução do algoritmo, com 10 baldes}
+\end{table}
+
+\appendix
+
+\chapter{Algoritmo em dois nodos distintos}
+
+
+\chapter{OpenMP vs OpenMPI}
+
+\end{document}
