@@ -6,9 +6,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define MAXI 100
-
-void rooms_mc(size_t n, int** D, int room[n / 2][2], size_t* cost, size_t* steps) {
+void rooms_mc(size_t n, int** D, int room[n / 2][2], size_t* cost, size_t* steps, int MAXI) {
     rng_populate_rooms(n, room);
 
     (*cost) = 0;
