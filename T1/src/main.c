@@ -9,9 +9,6 @@
 #include <unistd.h>
 
 int main(int argc, char** argv) {
-    time_t t;
-    srand((unsigned) time(&t));
-
     if (argc != 3) return 1;
     int n = atoi(argv[1]);
     if (n <= 0) return 2;
@@ -22,10 +19,13 @@ int main(int argc, char** argv) {
     for (int i = 0; i < n; i++) {
         D[i] = malloc(sizeof(int) * n);
     }
+
+    srand((unsigned) time(NULL) + clock());
     rng_incompatability_matrix(n, D);
 
     for (int i = 0; i < procs; i++) {
         if (!fork()) {
+            srand((unsigned) time(NULL) ^ (getpid() << 16));
             int room[n / 2][2];
             size_t cost;
             size_t steps;
@@ -41,6 +41,7 @@ int main(int argc, char** argv) {
 
     for (int i = 0; i < procs; i++) {
         if (!fork()) {
+            srand((unsigned) time(NULL) ^ (getpid() << 16));
             int room[n / 2][2];
             size_t cost;
             size_t steps;
