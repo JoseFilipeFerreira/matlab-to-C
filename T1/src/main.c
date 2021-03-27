@@ -4,7 +4,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/wait.h>
 #include <time.h>
+#include <unistd.h>
 
 int main(int argc, char** argv) {
     time_t t;
@@ -16,28 +18,35 @@ int main(int argc, char** argv) {
     int procs = atoi(argv[2]);
     if (procs <= 0) return 3;
 
-    int D[n][n];
+    int** D = malloc(sizeof(int*) * n);
+    for (int i = 0; i < n; i++) {
+        D[i] = malloc(sizeof(int) * n);
+    }
     rng_incompatability_matrix(n, D);
 
-    size_t* costsMC = malloc(sizeof(size_t) * procs);
-    size_t* stepsMC = malloc(sizeof(size_t) * procs);
-    size_t* costsSA = malloc(sizeof(size_t) * procs);
-    size_t* stepsSA = malloc(sizeof(size_t) * procs);
-
-    int roomMC[procs][n / 2][2];
     for (int i = 0; i < procs; i++) {
-        rooms_mc(n, D, roomMC[i], costsMC + i, stepsMC + i);
-        fprintf(stderr, "MC -> steps: %zu; cost: %zu\n", stepsMC[i], costsMC[i]);
+        if (!fork()) {
+            int room[n / 2][2];
+            size_t cost;
+            size_t steps;
+            rooms_mc(n, D, room, &cost, &steps);
+            fprintf(stderr, "MC -> steps: %zu; cost: %zu\n", steps, cost);
+            return 0;
+        }
+        if (!fork()) {
+            int room[n / 2][2];
+            size_t cost;
+            size_t steps;
+            rooms_sa(n, D, room, &cost, &steps);
+            fprintf(stderr, "SA -> steps: %zu; cost: %zu\n", steps, cost);
+            return 0;
+        }
     }
 
-    int roomSA[procs][n / 2][2];
-    for (int i = 0; i < procs; i++) {
-        rooms_sa(n, D, roomSA[i], costsSA + i, stepsSA + i);
-        fprintf(stderr, "SA -> steps: %zu; cost: %zu\n", stepsSA[i], costsSA[i]);
-    }
+    for (int i = 0; i < procs * 2; i++) wait(NULL);
 
-    free(costsSA);
-    free(stepsSA);
-    free(costsMC);
-    free(stepsMC);
+    for (int i = 0; i < n; i++) free(D[i]);
+    free(D);
+
+    return 0;
 }

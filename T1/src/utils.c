@@ -21,7 +21,7 @@ long long unsigned stop_timer(void) {
     return final_time - start_time;
 }
 
-void print_matrix(size_t size, int m[size][size]) {
+void print_matrix(size_t size, int** m) {
     size_t max_print = 8;
     if (size <= max_print) {
         for (size_t i = 0; i < size; i++) {
@@ -70,7 +70,7 @@ void rng_populate_rooms(size_t n, int room[n / 2][2]) {
     }
 }
 
-void rng_incompatability_matrix(size_t size, int matrix[size][size]) {
+void rng_incompatability_matrix(size_t size, int** matrix) {
     for (size_t i = 0; i < size; i++) {
         matrix[i][i] = 0;
         for (size_t j = 0; j < i; j++) {

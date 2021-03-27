@@ -7,10 +7,10 @@ void start_timer(void);
 
 long long unsigned stop_timer(void);
 
-void print_matrix(size_t size, int m[size][size]);
+void print_matrix(size_t size, int** m);
 
 void rng_populate_rooms(size_t n, int room[n / 2][2]);
 
-void rng_incompatability_matrix(size_t size, int matrix[size][size]);
+void rng_incompatability_matrix(size_t size, int** matrix);
 
 #endif
