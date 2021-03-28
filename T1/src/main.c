@@ -24,6 +24,9 @@ int main(int argc, char** argv) {
     srand((unsigned) time(NULL) + clock());
     rng_incompatability_matrix(n, D);
 
+    int cost_pipe[2];
+    if(pipe(cost_pipe) < 0) exit(1);
+
     for (int i = 0; i < procs; i++) {
         if (!fork()) {
             srand((unsigned) time(NULL) ^ (getpid() << 16));
@@ -31,12 +34,17 @@ int main(int argc, char** argv) {
             size_t cost;
             size_t steps;
             rooms_mc(n, D, room, &cost, &steps, maxi);
-            fprintf(stderr, "MC -> s: %zu, c: %zu\n", steps, cost);
+            write(cost_pipe[1], &cost, sizeof(size_t));
             return 0;
         }
     }
 
-    for (int i = 0; i < procs; i++) wait(NULL);
+    for(int i = 0; i < procs; i++){
+        size_t r;
+        read(cost_pipe[0], &r, sizeof(size_t));
+        fprintf(stderr, "%zu%s", r, i == procs - 1?"":",");
+    }
+
     fprintf(stderr, "\n");
 
 
@@ -47,11 +55,17 @@ int main(int argc, char** argv) {
             size_t cost;
             size_t steps;
             rooms_sa(n, D, room, &cost, &steps, maxi, tmin, cooldown);
-            fprintf(stderr, "SA -> s: %zu, c: %zu\n", steps, cost);
+            write(cost_pipe[1], &cost, sizeof(size_t));
             return 0;
         }
     }
-    for (int i = 0; i < procs; i++) wait(NULL);
+
+    for(int i = 0; i < procs; i++){
+        size_t r;
+        read(cost_pipe[0], &r, sizeof(size_t));
+        fprintf(stderr, "%zu%s", r, i == procs - 1?"":",");
+    }
+
     fprintf(stderr, "\n");
 
     for (int i = 0; i < n; i++) free(D[i]);
