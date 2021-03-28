@@ -1,5 +1,6 @@
 #include "roomsMC.h"
 #include "roomsSA.h"
+#include "rooms_greedy.h"
 #include "utils.h"
 
 #include <stdio.h>
@@ -67,6 +68,11 @@ int main(int argc, char** argv) {
     }
 
     fprintf(stderr, "\n");
+
+    int room[n / 2][2];
+    size_t cost;
+    rooms_greedy(n, D, room, &cost);
+    fprintf(stderr, "%zu\n", cost);
 
     for (int i = 0; i < n; i++) free(D[i]);
     free(D);
