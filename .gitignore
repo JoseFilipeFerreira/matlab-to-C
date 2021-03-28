@@ -1,3 +1,8 @@
 *.o
 *.output
-graph_*
+rooms
+*.aux
+*.log
+*.pdf
+*.out
+*.toc

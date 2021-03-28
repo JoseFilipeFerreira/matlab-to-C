@@ -26,8 +26,9 @@ int main(int argc, char** argv) {
     rng_incompatability_matrix(n, D);
 
     int cost_pipe[2];
-    if(pipe(cost_pipe) < 0) exit(1);
+    if (pipe(cost_pipe) < 0) exit(1);
 
+    // Monte-Carlo
     for (int i = 0; i < procs; i++) {
         if (!fork()) {
             srand((unsigned) time(NULL) ^ (getpid() << 16));
@@ -40,15 +41,15 @@ int main(int argc, char** argv) {
         }
     }
 
-    for(int i = 0; i < procs; i++){
+    for (int i = 0; i < procs; i++) {
         size_t r;
         read(cost_pipe[0], &r, sizeof(size_t));
-        fprintf(stderr, "%zu%s", r, i == procs - 1?"":",");
+        fprintf(stderr, "%zu%s", r, i == procs - 1 ? "" : ",");
     }
 
     fprintf(stderr, "\n");
 
-
+    // Monte-Carlo with annealing
     for (int i = 0; i < procs; i++) {
         if (!fork()) {
             srand((unsigned) time(NULL) ^ (getpid() << 16));
@@ -61,10 +62,10 @@ int main(int argc, char** argv) {
         }
     }
 
-    for(int i = 0; i < procs; i++){
+    for (int i = 0; i < procs; i++) {
         size_t r;
         read(cost_pipe[0], &r, sizeof(size_t));
-        fprintf(stderr, "%zu%s", r, i == procs - 1?"":",");
+        fprintf(stderr, "%zu%s", r, i == procs - 1 ? "" : ",");
     }
 
     fprintf(stderr, "\n");
@@ -72,7 +73,11 @@ int main(int argc, char** argv) {
     int room[n / 2][2];
     size_t cost;
     rooms_greedy(n, D, room, &cost);
-    fprintf(stderr, "%zu\n", cost);
+    for (int i = 0; i < procs; i++) {
+        fprintf(stderr, "%zu%s", cost, i == procs - 1 ? "" : ",");
+    }
+
+    fprintf(stderr, "\n");
 
     for (int i = 0; i < n; i++) free(D[i]);
     free(D);

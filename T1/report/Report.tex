@@ -51,51 +51,123 @@ linkcolor=black}
 \pagebreak
 
 \chapter{Introdução}
-O algoritmo escolhido para o projeto da unidade curricular de Computação
-Paralela e Distribuída foi o \textit{Bucket Sort}.
+O \textit{room assignment problem} consiste em distribuir n pessoas por n/2
+salas de forma a minimizar os maus relacionamentos entre os habitantes de cada
+sala. A única maneira de obter o melhor resultado para este algoritmo consiste
+em testar todas as possibilidades, calcular um valor para cada um com recurso a
+uma função objetivo e procurar o menor entre eles. Resolver este problema com
+forca bruta resulta numa complexidade de O(n!) fazendo com que o tempo da
+computação aumente de forma extremamente rápida.
 
-Numa primeira fase do trabalho desenvolvemos uma versão sequencial do projeto e
-procedemos ao \textit{benchmarking} do programa resultante. Em seguida
-convertemos a implementação sequencial numa versão com utilização de memoria
-partilhada fazendo uso de \textit{OpenMP} e comparamos o resultado com a versão
-sequencial desenvolvida anteriormente.
+Para contornar este problema é possível recorrer a métodos que, apesar de não
+calcularem o melhor resultado possível, conseguem calcular uma aproximação do
+resultado final. Para tal pode-se desenvolver algoritmos determinísticos
+(\textit{greedy search}) e algoritmos não determinísticos.
 
-Nesta segunda fase desenvolvemos uma nova versao do \textit{bucket sort} fazendo
-uso de memoria distribuída com o \textit{OpenMPI} comparando os resultados do
-benchmarking deste algoritmo com os resultados obtidos na fase anterior.
+Um problema NP, ou seja, um problema polinomial em tempo não determinístico é
+uma classe utilizada para classificar um sub conjunto de problemas de decisão.
+Estes problemas são caracterizados por ser possível calcular um resultado de
+forma não determinística em tempo polinomial. A solução NP foi desenvolvida
+fazendo uso do método de Monte-Carlo com e sem \textit{annealing}.
 
-De notar que todos os benchmarks descritos foram efeutados em nós do tipo 642 do
-cluster \textit{SeARCH}, e todos os executáveis foram compilados o
-\textit{MPIcc} na versão 1.8.1 do \textit{OpenMPI}, utilizando a versão
-7.2.0 do \textit{gcc}, e com as flags \textit{-O3 -std=c11} para garantir
-a maior consistência entre os diferentes benchmarks. Na
-ausência de indicação, os benchmarks foram efetuados com um input de 100000000
-de elementos aleatórios, entre -1000 e 500000.
+Ao longo deste relatório iremos descrever em mais detalhe como desenvolvemos
+estes algoritmos e comparar os resultados obtidos entre eles.
 
-\chapter{OpenMPI} \label{chap:ompi}
+\chapter{Soluções desenvolvidas}
 
-\section{Descrição da Implementação}
 
-\section{Análise dos resultados}
-\begin{table}[h]
+Internamente os dados são representados da seguinte forma:
+\begin{itemize}
+    \item Cada pessoa tem um id associado de 0 ate n-1;
+    \item O relacionamento entre a pessoa i e a pessoa j é dado pelo valor
+        D(i,j) contido numa matriz simétrica D com valores entre 1 e 10;
+    \item As salas são uma matriz n/2 por 2 em que cada sala é uma coluna;
+\end{itemize}
+
+Dentro de cada teste, cada algoritmo determinístico foi executado uma vez e cada
+algoritmo não determinístico foi executado mil vezes fazendo uso sempre da mesma
+matriz de relacionamentos populada de forma aleatória no inicio do teste.
+
+\section{Greedy Search}
+
+Este método consiste em percorrer todas as salas uma a uma. Para cada sala
+procura-se quais são as pessoas que se dão melhor para as quais ainda não foi
+atribuída uma sala e coloca se nessa mesma sala. Desta forma o algoritmo é
+determinístico e polinomial.
+
+A complexidade de percorrer cada sala é O(n/2), para procurar qual é o par que
+vai ocupar cada sala a complexidade é O(n²/2 - n). Multiplicando uma pela outra
+obtemos que a complexidade do algoritmo é O(n³). Resultando numa complexidade
+muito menor do que a complexidade do algoritmo de \textit{brute froce} para um n
+suficientemente grande.
+
+\section{Monte-Carlo}
+
+Por contraste com o método de \textit{greedy search}, o método de Monte-Carlo é
+não determinístico.
+
+No inicio do calculo, preenche-se as salas com uma permutação aleatória de
+pessoas de forma a obter um estado inicial. Em seguida calcula-se o custo desse
+estado inicial.
+
+Para melhorar o resultado do estado inicial cria-se um loop que corre um
+conjunto de passos. Primeiro calcula-se duas salas consecutivas e compara-se a
+diferença de custo se os membros dessas salas fossem trocados. Caso o custo
+fique mais baixo a troca é efetivada e o custo final atualizado. Caso ocorram
+maxi loops ao sem ser feita nenhuma troca o algoritmo termina.
+
+\section{Monte-Carlo com Annealing}
+
+O metodo de Monte-Carlo com \textit{Annealing} é muito semelhante ao método de
+Monte-Carlo sem \textit{annealing}. Primeiro é introduzido o conceito de
+temperatura. A temperatura começa a 1. E em cada ciclo a temperatura decai
+seguindo a formula T = T * Tdecay. Assim que a temperatura atinge um Tmin as
+iterações acabam. Aquando de decidir se a ordem das salas e trocada ou não
+existe uma clausula extra definida por exp(-delta/temperatura) <= rand.
+
+\chapter{Analise de Resultados}
+
+
+\begin{figure}[h]
+\centering
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.95\linewidth]{images/graph_comp_maxi_mc.png}
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.95\linewidth]{images/graph_comp_maxi_sa.png}
+\end{minipage}
+    \caption{Comparação de diferentes valores para maxi em Monte-Carlo com e sem annealing}
+\end{figure}
+
+A a variável maxi define o numero máximo de iterações que podem ser realizadas sem
+ocorrer alterações no custo da distribuição pelas salas.
+
+No caso do Monte-Carlo sem Annealing, aumentar o maxi permite aumentar o numero
+de ciclos em que se procura por uma solução melhor do que a que se tem
+anualmente. Por isso, quanto maior o maxi melhor os resultados obtidos.
+
+Por outro lado, no caso de Monte-Carlo com Annealing,
+
+
+\begin{figure}[h]
+\centering
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.95\linewidth]{images/graph_comp_tmin_sa.png}
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.95\linewidth]{images/graph_comp_tdecay_sa.png}
+\end{minipage}
+    \caption{Comparação de diferentes valores para Tmin e Tdecay em Monte-Carlo com annealing}
+\end{figure}
+
+\begin{figure}[h]
     \centering
-    \begin{tabular}{|c|c|}
-        \hline
-        Processes & Time(Seconds) \\ \hline
-        2         & 10,170775     \\ \hline
-        4         & 10,061176     \\ \hline
-        8         & 6,581753      \\ \hline
-        16        & 2,5495        \\ \hline
-        32        & 6,165742      \\ \hline
-    \end{tabular}
-    \caption{\label{tab:Times}Tempos de execução do algoritmo, com 10 baldes}
-\end{table}
-
-\appendix
-
-\chapter{Algoritmo em dois nodos distintos}
-
-
-\chapter{OpenMP vs OpenMPI}
+        \includegraphics[width=\textwidth]{images/graph_comp_all_algorithms.png}
+        \caption{Comparação de todos os métodos desenvolvidos}
+\end{figure}
 
 \end{document}

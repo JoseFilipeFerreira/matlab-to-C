@@ -6,7 +6,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void rooms_sa(size_t n, int** D, int room[n / 2][2], size_t* cost, size_t* steps, int MAXI, double TMIN, double COOLDOWN) {
+void rooms_sa(
+    size_t n,
+    int** D,
+    int room[n / 2][2],
+    size_t* cost,
+    size_t* steps,
+    int MAXI,
+    double TMIN,
+    double COOLDOWN) {
     rng_populate_rooms(n, room);
 
     (*cost) = 0;
@@ -19,7 +27,7 @@ void rooms_sa(size_t n, int** D, int room[n / 2][2], size_t* cost, size_t* steps
     double T = 1;
 
     // stop if no changes for 100 trials
-    while (i < MAXI) {
+    while (i < MAXI && T <= TMIN) {
         (*steps)++;
         i++;
         // choose 2 sucessive rooms to swap
@@ -39,7 +47,5 @@ void rooms_sa(size_t n, int** D, int room[n / 2][2], size_t* cost, size_t* steps
             i = 0;
         }
         T *= COOLDOWN;
-
-        if (T <= TMIN) return;
     }
 }
