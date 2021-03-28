@@ -127,6 +127,8 @@ existe uma clausula extra definida por exp(-delta/temperatura) <= rand.
 
 \chapter{Analise de Resultados}
 
+Para representar os resultados obtidos decidimos utilizar um gráfico de caixa,
+de forma a mostrar a concentração dos resultados, bem como os seus extremantes.
 
 \begin{figure}[h]
 \centering
@@ -141,15 +143,18 @@ existe uma clausula extra definida por exp(-delta/temperatura) <= rand.
     \caption{Comparação de diferentes valores para maxi em Monte-Carlo com e sem annealing}
 \end{figure}
 
-A a variável maxi define o numero máximo de iterações que podem ser realizadas sem
+A variável maxi define o numero máximo de iterações que podem ser realizadas sem
 ocorrer alterações no custo da distribuição pelas salas.
 
-No caso do Monte-Carlo sem Annealing, aumentar o maxi permite aumentar o numero
+No caso do Monte-Carlo sem Annealing, aumentar o maxi permite aumentar o número
 de ciclos em que se procura por uma solução melhor do que a que se tem
-anualmente. Por isso, quanto maior o maxi melhor os resultados obtidos.
+atualmente. Por isso, quanto maior o maxi melhor os resultados obtidos.
 
-Por outro lado, no caso de Monte-Carlo com Annealing,
-
+Por outro lado, no caso de Monte-Carlo com Annealing, como é possível fazer
+trocas mesmo que não seja para melhorar o custo, o caso de paragem do algoritmo
+é quase sempre quando a temperatura atinge o tmin, fazendo com que o maxi não
+tenha grande impacto no resultado obtido. Desta forma, todos os testes foram
+efetuados com o valor de maxi a 100.
 
 \begin{figure}[h]
 \centering
@@ -164,10 +169,39 @@ Por outro lado, no caso de Monte-Carlo com Annealing,
     \caption{Comparação de diferentes valores para Tmin e Tdecay em Monte-Carlo com annealing}
 \end{figure}
 
+\pagebreak
+Como podemos ver, embora sejam pequenas variações, quanto
+menor o Tmin, mais concentrados os resultados obtidos, graças ao maior número de
+iterações efetuadas. Esta diminuição leva também a que tanto os quartis como a
+mediana apresentam valores mais baixos, o que corresponde, regra geral, à obtenção de
+melhores resultados.
+
+Com a variação do Tdecay, não há nenhuma tendência explicita definida, pois com
+a diminuição deste são efetuadas menos iterações, mas ao mesmo tempo, são
+efetuadas menos trocas que possam contribuir para a obtenção de resultados
+piores. Por outro lado, ao aumentar o Tdecay, temos mais iterações do
+algoritmo, mas podendo este ter mais trocas que contribuam para a obtenção de um
+custo superior.
+
+\pagebreak
 \begin{figure}[h]
     \centering
         \includegraphics[width=\textwidth]{images/graph_comp_all_algorithms.png}
         \caption{Comparação de todos os métodos desenvolvidos}
 \end{figure}
+
+Comparando o algoritmo que utilizada Monte-Carlo com o que utiliza também
+Annealing, podemos ver que o que utiliza apenas Monte-Carlo produz resultados
+substancialmente melhores que o que também utiliza Annealing, visto que este
+ultimo realiza trocas desnecessárias e prejudiciais ao bom resultado do
+algoritmo.
+
+Comparando os anteriores com a pesquisa Greedy, vemos que a pesquisa Greedy
+produz o melhor resultado comparado com todos os anteriores, pois como o
+intervalo de valores a escolher é muito restrito quando comparado com o número
+de pessoas que utlizamos para testar, faz com que exista sempre um valor muito
+pequeno para a relação entre duas pessoas, o que é extremamente benéfico para o
+funcionamento deste algoritmo, levando quase sempre a uma solução otima ou muito
+perto desta.
 
 \end{document}
