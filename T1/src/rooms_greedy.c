@@ -25,7 +25,6 @@ void rooms_greedy(size_t n, int** D, int room[n / 2][2], size_t* cost) {
         }
         *cost += tmp_cost;
         visited[room[times][0]] = visited[room[times][1]] = 1;
-        printf("%d %d %d\n", room[times][0], room[times][1], tmp_cost);
         tmp_cost = 0;
     }
 }
