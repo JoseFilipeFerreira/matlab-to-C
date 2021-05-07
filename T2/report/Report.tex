@@ -137,7 +137,13 @@ dependências de dados dentro de si mesmas.
 \section{Successive Overrelaxation com Red-Black}
 
 A versão sequencial deste algoritmo é muito próxima da versão sequencial do
-algoritmo Gauss-Seidel com Red-Black.
+algoritmo Gauss-Seidel com Red-Black. No Successive Overrelaxation com Red-Black
+o que difere é a parte como é calculado o novo valor do vetor w. Neste caso,
+para além de se ter em conta a média dos quatro pontos adjacentes ao ponto que
+se está a calcular, também se tem em conta o próprio valor seguindo a formula:
+
+\[ p = \frac{2}{1 + sin{\frac{\pi}{SIZE - 1}}} \]
+\[novo\_valor = (1-p) * pixel + p * media \]
 
 % TODO explicar paralelização
 
