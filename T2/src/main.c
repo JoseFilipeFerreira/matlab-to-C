@@ -7,6 +7,12 @@
 
 #define I(N, i, j) ((N) * (i) + (j))
 
+#ifdef DEBUG
+#define DBG(FORMAT, ARGS...) fprintf(stderr, FORMAT, ARGS)
+#else
+#define DBG(FORMAT, ARGS...) {}
+#endif
+
 void to_image(char* filename, size_t N, float* img) {
     float max = img[0];
     for (size_t i = 1; i < N * N; ++i) {
@@ -150,6 +156,42 @@ float* poisson_gs_pm(size_t N, float TOL, size_t* ITER) {
     return w;
 }
 
+float* poisson_gs_parallel(size_t N, float TOL, size_t* ITER) {
+    float* w = malloc(sizeof(float) * N * N);
+    parallel_populate_matrix(N, w);
+    float* u = malloc(sizeof(float) * N * N);
+
+    float DIFF = TOL + 1;
+    size_t iter = 0;
+    for (; DIFF > TOL; ++iter) {
+        // store last iteration in u
+        memcpy(u, w, sizeof(float) * N * N);
+
+        for (size_t diag = 1; diag < (N - 1) * 2; ++diag) {
+#pragma omp parallel for
+            for (size_t i = 1; i <= diag; ++i) {
+                int j = diag - i + 1;
+                if(j < N - 1 && i < N - 1) {
+                    w[I(N, i, j)] = (w[I(N, i - 1, j)] + w[I(N, i, j - 1)] + w[I(N, i, j + 1)] +
+                                 w[I(N, i + 1, j)]) /
+                                4;
+                }
+            }
+        }
+
+        DIFF = fabs(w[0] - u[0]);
+        for (size_t i = 1; i < N * N; ++i) {
+            float n = fabs(w[i] - u[i]);
+            DIFF = (DIFF < n) ? n : DIFF;
+        }
+    }
+
+    free(u);
+
+    *ITER = iter;
+    return w;
+}
+
 float* poisson_gsrb(size_t N, float TOL, size_t* ITER) {
     float* w = malloc(sizeof(float) * N * N);
     populate_matrix(N, w);
@@ -162,7 +204,7 @@ float* poisson_gsrb(size_t N, float TOL, size_t* ITER) {
         memcpy(u, w, sizeof(float) * N * N);
 
         // update red points
-        for (size_t i = 1; i < N - 1; ++i) {
+        for (size_t i = 1; i < N - 2; ++i) {
             for (size_t j = 1 + (i % 2); j < N - 1; j += 2) {
                 w[I(N, i, j)] = (w[I(N, i - 1, j)] + w[I(N, i, j - 1)] + w[I(N, i, j + 1)] +
                                  w[I(N, i + 1, j)]) /
@@ -447,12 +489,12 @@ void run_test(
 }
 
 int main(void) {
-    size_t N = 1000;
+    size_t N = 2000;
     float TOL = 0.02;
     size_t ITER;
-
     run_test(poisson_gs, N, TOL, &ITER, "poisson_gs.ppm");
     run_test(poisson_gs_pm, N, TOL, &ITER, "poisson_gs_pm.ppm");
+    run_test(poisson_gs_parallel, N, TOL, &ITER, "poisson_gs.ppm");
 
     run_test(poisson_gsrb, N, TOL, &ITER, "poisson_gsrb.ppm");
     run_test(poisson_gsrb_pm, N, TOL, &ITER, "poisson_gsrb_pm.ppm");
