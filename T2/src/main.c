@@ -373,8 +373,8 @@ void run_test(
 }
 
 int main(void) {
-    size_t N = 200;
-    float TOL = 0.02;
+    size_t N = 1000;
+    float TOL = 0.001;
     size_t ITER;
     run_test(poisson_gs, N, TOL, &ITER, "poisson_gs.ppm");
     run_test(poisson_gs_parallel, N, TOL, &ITER, "poisson_gs_par.ppm");

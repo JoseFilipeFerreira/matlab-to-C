@@ -210,17 +210,18 @@ Os testes foram corridos no cluster Search da universidade do Minho nas máquina
 da fila cpar, nomeadamente as máquinas 652. Os valores foram obtidos fazendo uso
 do k-best com k igual a 8. O programa foi compilado com -O3.
 
+
 \begin{table}[h]
 \centering
-\begin{tabular}{|l|l|l|l|}
+\begin{tabular}{|l|l|l|}
 \hline
-                                                 & num iterações & tempo & speedup \\ \hline
-Gauss-Seidel                                     &               &       &         \\ \hline
-Gauss-Seidel paralelo                            &               &       &         \\ \hline
-Gauss-Seidel com Red-Black                       &               &       &         \\ \hline
-Gauss-Seidel com Red-Black paralelo              &               &       &         \\ \hline
-Successive Overrelaxation com Red-Black          &               &       &         \\ \hline
-Successive Overrelaxation com Red-Black paralelo &               &       &         \\ \hline
+                                                 & num iterações & tempo (segundos) \\ \hline
+Gauss-Seidel                                     & 922           & 0.050               \\ \hline
+Gauss-Seidel paralelo                            & 922           & 135.080               \\ \hline
+Gauss-Seidel com Red-Black                       & 540           & 0.020               \\ \hline
+Gauss-Seidel com Red-Black paralelo              & 915           & 1.720               \\ \hline
+Successive Overrelaxation com Red-Black          & 571           & 0.010               \\ \hline
+Successive Overrelaxation com Red-Black paralelo & 571           & 0.280               \\ \hline
 \end{tabular}
 \caption{Comparação de Performance (para N=100 e TOL=0.001)}
 \label{tab:tempo}
@@ -228,15 +229,15 @@ Successive Overrelaxation com Red-Black paralelo &               &       &      
 
 \begin{table}[h]
 \centering
-\begin{tabular}{|l|l|l|l|}
+\begin{tabular}{|l|l|l|}
 \hline
-                                                 & num iterações & tempo & speedup \\ \hline
-Gauss-Seidel                                     &               &       &         \\ \hline
-Gauss-Seidel paralelo                            &               &       &         \\ \hline
-Gauss-Seidel com Red-Black                       &               &       &         \\ \hline
-Gauss-Seidel com Red-Black paralelo              &               &       &         \\ \hline
-Successive Overrelaxation com Red-Black          &               &       &         \\ \hline
-Successive Overrelaxation com Red-Black paralelo &               &       &         \\ \hline
+                                                 & num iterações & tempo (segundos) \\ \hline
+Gauss-Seidel                                     & 923           & 1.670            \\ \hline
+Gauss-Seidel paralelo                            & 923           & 516.480          \\ \hline
+Gauss-Seidel com Red-Black                       & 610           & 0.440               \\ \hline
+Gauss-Seidel com Red-Black paralelo              & 902           & 23.270               \\ \hline
+Successive Overrelaxation com Red-Black          & 126           & 0.460            \\ \hline
+Successive Overrelaxation com Red-Black paralelo & 126           & 14.660           \\ \hline
 \end{tabular}
 \caption{Comparação de Performance (para N=500 e TOL=0.001)}
 \label{tab:tempo}
@@ -244,15 +245,15 @@ Successive Overrelaxation com Red-Black paralelo &               &       &      
 
 \begin{table}[h]
 \centering
-\begin{tabular}{|l|l|l|l|}
+\begin{tabular}{|l|l|l|}
 \hline
-                                                 & num iterações & tempo & speedup \\ \hline
-Gauss-Seidel                                     &               &       &         \\ \hline
-Gauss-Seidel paralelo                            &               &       &         \\ \hline
-Gauss-Seidel com Red-Black                       &               &       &         \\ \hline
-Gauss-Seidel com Red-Black paralelo              &               &       &         \\ \hline
-Successive Overrelaxation com Red-Black          &               &       &         \\ \hline
-Successive Overrelaxation com Red-Black paralelo &               &       &         \\ \hline
+                                                 & num iterações & tempo (segundos) \\ \hline
+Gauss-Seidel                                     & 922           & 7.030            \\ \hline
+Gauss-Seidel paralelo                            & 922           & 1189.080         \\ \hline
+Gauss-Seidel com Red-Black                       & 610           & 2.140                 \\ \hline
+Gauss-Seidel com Red-Black paralelo              & 902           & 153.540                 \\ \hline
+Successive Overrelaxation com Red-Black          & 1107          & 3.870            \\ \hline
+Successive Overrelaxation com Red-Black paralelo & 1107          & 123.730          \\ \hline
 \end{tabular}
 \caption{Comparação de Performance (para N=1000 e TOL=0.001)}
 \label{tab:tempo}
