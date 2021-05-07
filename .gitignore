@@ -1,6 +1,7 @@
 *.o
 *.output
 rooms
+poisson
 *.aux
 *.log
 *.pdf
