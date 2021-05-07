@@ -1,5 +1,5 @@
 function [w,ITER]=PoissonGS(N, TOL)
-% Finds the steady-state solution for the temperature distribution on a 
+% Finds the steady-state solution for the temperature distribution on a
 % square plate, for particular boundary conditions
 % USES GAUSS-SEIDEL ITERATIONS
 % N is the number of grid points in each direction (including boundary
@@ -8,11 +8,11 @@ function [w,ITER]=PoissonGS(N, TOL)
 % IN THE GRID, USES i FOR ROW (ASCENDENT), j FOR COLUMN (LEFT-RIGHT)
 
 
-% SET BOUNDARY VALUES 
+% SET BOUNDARY VALUES
 % Temperature is zero at the top and 100 on the other boundaries
-w(1,1:N)=100;  % lower boundary 
-w(1:N,1)=100;  % left boundary 
-w(1:N,N)=100;  % right boundary 
+w(1,1:N)=100;  % lower boundary
+w(1:N,1)=100;  % left boundary
+w(1:N,N)=100;  % right boundary
 w(N,1:N)=0;    % boundary above
 w(2:N-1,2:N-1)=50; % initial values for interior points
 
@@ -27,11 +27,11 @@ while DIFF>TOL
         end
     end
     ITER=ITER+1;
-    DIFF=max(max(abs(w-u)));  
+    DIFF=max(max(abs(w-u)));
 end
 
 % DISPLAYS A COLOURFUL MAP OF DISTRIBUTIONS
-w=flipud(w); image(w,'CDataMapping','scaled')
+image(w,'CDataMapping','scaled')
 colorbar
 
 
