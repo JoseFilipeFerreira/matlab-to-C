@@ -15,8 +15,10 @@
 
 void to_image(char* filename, size_t N, float* img) {
     float max = img[0];
+    float min = img[0];
     for (size_t i = 1; i < N * N; ++i) {
         max = (max < img[i]) ? img[i] : max;
+        min = (min > img[i]) ? img[i] : min;
     }
 
     FILE* fp = fopen(filename, "w");
@@ -26,7 +28,9 @@ void to_image(char* filename, size_t N, float* img) {
     for (int h = N - 1; h >= 0; --h) {
         for (size_t w = 0; w < N; ++w) {
             float pixel = (img[I(N, h, w)] > 0) ? img[I(N, h, w)] : 0;
-            float H = 360 * pixel / max;
+
+            float H = 60 + (240 - 60) * (1-(pixel + min) / (max + min));
+
             float X = 1 * (1 - fabs(fmod(H / 60.0, 2) - 1));
             float r, g, b;
             if (H >= 0 && H < 60) {
@@ -42,6 +46,7 @@ void to_image(char* filename, size_t N, float* img) {
             } else {
                 r = 1, g = 0, b = X;
             }
+
             fprintf(fp, "%d %d %d\n", (int) (r * 255), (int) (g * 255), (int) (b * 255));
         }
     }
