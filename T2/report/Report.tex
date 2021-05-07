@@ -104,7 +104,18 @@ ponto abaixo, o ponto à esquerda e o ponto à direita e divide-se o resultado p
 4. Desta forma o valor do ponto é substituído pela média dos pontos diretamente
 adjacentes.
 
-% TODO explicar paralelização
+Para parelelizar este algoritmo, notamos que era possivel calcular os pontos de
+uma diagonal em simultaneo. Entao criamos um ciclo que itera por cada diagonal,
+e calculamos cada ponto desta em paralelo.
+
+\begin{figure}[h]
+    \centering
+        \includegraphics[width=0.4\textwidth]{images/wave.jpeg}
+        \caption{Representação visual do algoritmo}
+        \label{fig:wave}
+\end{figure}
+
+\pagebreak
 
 \section{Gauss-Seidel com Red-Black}
 
@@ -132,7 +143,10 @@ adjacentes
 Desta forma cada uma destas duas passagens dentro de cada iteração não tem
 dependências de dados dentro de si mesmas.
 
-% TODO explicar paralelização
+Visto que não existem dependências de dados entre calcular as celulas vermelhas
+e as celulas pretas, é possivel dentro de cada iteração calcular todos os pontos
+de uma cor em simultaneo. Tomando partido disto, aplicamos a paralelização nos
+ciclos responsaveis por calcular cada uma das cores.
 
 \section{Successive Overrelaxation com Red-Black}
 
@@ -148,7 +162,9 @@ se está a calcular, também se tem em conta o próprio valor seguindo a formula
 Esta mudança implica que o algoritmo tende mais rapidamente para o caso de
 paragem e, por isso, tende a ter menos iterações.
 
-% TODO explicar paralelização
+Como a iteração sobre o vetor w é semelhante à usada em Gauss-Seidel com
+Red-Black, a paralelização deste algoritmo foi efetuada da mesma forma, descrita
+acima.
 
 \chapter{Representação de Resultados}
 
@@ -204,7 +220,7 @@ o HSV obtido para RGB e colocar no ficheiro.
     tolerância constante}
 \end{figure}
 
-\chapter{Analize de Resultados}
+\chapter{Analise de Performance}
 
 Os testes foram corridos no cluster Search da universidade do Minho nas máquinas
 da fila cpar, nomeadamente as máquinas 652. Os valores foram obtidos fazendo uso

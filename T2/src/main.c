@@ -372,9 +372,9 @@ void run_test(
     free(img);
 }
 
-int main(void) {
-    size_t N = 1000;
-    float TOL = 0.001;
+int main(int argc, char* argv[]) {
+    size_t N = atoi(argv[1]);
+    float TOL = 0.02;
     size_t ITER;
     run_test(poisson_gs, N, TOL, &ITER, "poisson_gs.ppm");
     run_test(poisson_gs_parallel, N, TOL, &ITER, "poisson_gs_par.ppm");
