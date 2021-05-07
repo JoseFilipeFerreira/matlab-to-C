@@ -275,4 +275,11 @@ Successive Overrelaxation com Red-Black paralelo & 1107          & 123.730      
 \label{tab:tempo}
 \end{table}
 
+\pagebreak
+Como apresentado acima, notamos que a versão paralela dos algoritmos se tornou
+substancialmente mais lenta. Com uma analise mais atenta da execução destes, com
+recurso à ferramenta "perf" pudemos concluir que grande parte do tempo (mais de 50\%) 
+foi gasto em sincronização de threads, nomeadamente nas barreiras implicitas presentes 
+no final de cada scope paralela.
+
 \end{document}
