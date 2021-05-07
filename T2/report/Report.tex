@@ -145,6 +145,9 @@ se está a calcular, também se tem em conta o próprio valor seguindo a formula
 \[ p = \frac{2}{1 + sin{\frac{\pi}{SIZE - 1}}} \]
 \[novo\_valor = (1-p) * pixel + p * media \]
 
+Esta mudança implica que o algoritmo tende mais rapidamente para o caso de
+paragem e, por isso, tende a ter menos iterações.
+
 % TODO explicar paralelização
 
 \chapter{Representação de Resultados}
@@ -185,18 +188,74 @@ o HSV obtido para RGB e colocar no ficheiro.
 
 \begin{figure}[h]
 \centering
-\begin{minipage}{.5\textwidth}
+\begin{minipage}{.3\textwidth}
   \centering
-  \includegraphics[width=.95\linewidth]{images/eng.jpeg}
+  \includegraphics[width=.95\linewidth]{images/poisson_gs_100.png}
 \end{minipage}%
-\begin{minipage}{.5\textwidth}
+\begin{minipage}{.3\textwidth}
   \centering
-  \includegraphics[width=.95\linewidth]{images/eng.jpeg}
+  \includegraphics[width=.95\linewidth]{images/poisson_gs_500.png}
 \end{minipage}
-    \caption{Comparação de diferentes valores para Tmin e Tdecay em Monte-Carlo com annealing}
+\begin{minipage}{.3\textwidth}
+  \centering
+  \includegraphics[width=.95\linewidth]{images/poisson_gs_1000.png}
+\end{minipage}
+    \caption{Comparação de diferentes outputs com diferentes tamanhos e
+    tolerância constante}
 \end{figure}
 
 \chapter{Analize de Resultados}
 
+Os testes foram corridos no cluster Search da universidade do Minho nas máquinas
+da fila cpar, nomeadamente as máquinas 652. Os valores foram obtidos fazendo uso
+do k-best com k igual a 8. O programa foi compilado com -O3.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|l|}
+\hline
+                                                 & num iterações & tempo & speedup \\ \hline
+Gauss-Seidel                                     &               &       &         \\ \hline
+Gauss-Seidel paralelo                            &               &       &         \\ \hline
+Gauss-Seidel com Red-Black                       &               &       &         \\ \hline
+Gauss-Seidel com Red-Black paralelo              &               &       &         \\ \hline
+Successive Overrelaxation com Red-Black          &               &       &         \\ \hline
+Successive Overrelaxation com Red-Black paralelo &               &       &         \\ \hline
+\end{tabular}
+\caption{Comparação de Performance (para N=100 e TOL=0.001)}
+\label{tab:tempo}
+\end{table}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|l|}
+\hline
+                                                 & num iterações & tempo & speedup \\ \hline
+Gauss-Seidel                                     &               &       &         \\ \hline
+Gauss-Seidel paralelo                            &               &       &         \\ \hline
+Gauss-Seidel com Red-Black                       &               &       &         \\ \hline
+Gauss-Seidel com Red-Black paralelo              &               &       &         \\ \hline
+Successive Overrelaxation com Red-Black          &               &       &         \\ \hline
+Successive Overrelaxation com Red-Black paralelo &               &       &         \\ \hline
+\end{tabular}
+\caption{Comparação de Performance (para N=500 e TOL=0.001)}
+\label{tab:tempo}
+\end{table}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|l|}
+\hline
+                                                 & num iterações & tempo & speedup \\ \hline
+Gauss-Seidel                                     &               &       &         \\ \hline
+Gauss-Seidel paralelo                            &               &       &         \\ \hline
+Gauss-Seidel com Red-Black                       &               &       &         \\ \hline
+Gauss-Seidel com Red-Black paralelo              &               &       &         \\ \hline
+Successive Overrelaxation com Red-Black          &               &       &         \\ \hline
+Successive Overrelaxation com Red-Black paralelo &               &       &         \\ \hline
+\end{tabular}
+\caption{Comparação de Performance (para N=1000 e TOL=0.001)}
+\label{tab:tempo}
+\end{table}
 
 \end{document}
