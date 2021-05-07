@@ -8,9 +8,10 @@
 #define I(N, i, j) ((N) * (i) + (j))
 
 #ifdef DEBUG
-#define DBG(FORMAT, ARGS...) fprintf(stderr, FORMAT, ARGS)
+#    define DBG(FORMAT, ARGS...) fprintf(stderr, FORMAT, ARGS)
 #else
-#define DBG(FORMAT, ARGS...) {}
+#    define DBG(FORMAT, ARGS...) \
+        {}
 #endif
 
 void to_image(char* filename, size_t N, float* img) {
@@ -29,7 +30,7 @@ void to_image(char* filename, size_t N, float* img) {
         for (size_t w = 0; w < N; ++w) {
             float pixel = (img[I(N, h, w)] > 0) ? img[I(N, h, w)] : 0;
 
-            float H = 60 + (240 - 60) * (1-(pixel + min) / (max + min));
+            float H = 60 + (240 - 60) * (1 - (pixel + min) / (max + min));
 
             float X = 1 * (1 - fabs(fmod(H / 60.0, 2) - 1));
             float r, g, b;
@@ -129,41 +130,9 @@ float* poisson_gs(size_t N, float TOL, size_t* ITER) {
     return w;
 }
 
-float* poisson_gs_pm(size_t N, float TOL, size_t* ITER) {
-    float* w = malloc(sizeof(float) * N * N);
-    parallel_populate_matrix(N, w);
-    float* u = malloc(sizeof(float) * N * N);
-
-    float DIFF = TOL + 1;
-    size_t iter = 0;
-    for (; DIFF > TOL; ++iter) {
-        // store last iteration in u
-        memcpy(u, w, sizeof(float) * N * N);
-
-        for (size_t i = 1; i < N - 1; ++i) {
-            for (size_t j = 1; j < N - 1; ++j) {
-                w[I(N, i, j)] = (w[I(N, i - 1, j)] + w[I(N, i, j - 1)] + w[I(N, i, j + 1)] +
-                                 w[I(N, i + 1, j)]) /
-                                4;
-            }
-        }
-
-        DIFF = fabs(w[0] - u[0]);
-        for (size_t i = 1; i < N * N; ++i) {
-            float n = fabs(w[i] - u[i]);
-            DIFF = (DIFF < n) ? n : DIFF;
-        }
-    }
-
-    free(u);
-
-    *ITER = iter;
-    return w;
-}
-
 float* poisson_gs_parallel(size_t N, float TOL, size_t* ITER) {
     float* w = malloc(sizeof(float) * N * N);
-    parallel_populate_matrix(N, w);
+    populate_matrix(N, w);
     float* u = malloc(sizeof(float) * N * N);
 
     float DIFF = TOL + 1;
@@ -176,10 +145,10 @@ float* poisson_gs_parallel(size_t N, float TOL, size_t* ITER) {
 #pragma omp parallel for
             for (size_t i = 1; i <= diag; ++i) {
                 int j = diag - i + 1;
-                if(j < N - 1 && i < N - 1) {
+                if (j < N - 1 && i < N - 1) {
                     w[I(N, i, j)] = (w[I(N, i - 1, j)] + w[I(N, i, j - 1)] + w[I(N, i, j + 1)] +
-                                 w[I(N, i + 1, j)]) /
-                                4;
+                                     w[I(N, i + 1, j)]) /
+                                    4;
                 }
             }
         }
@@ -239,51 +208,9 @@ float* poisson_gsrb(size_t N, float TOL, size_t* ITER) {
     return w;
 }
 
-float* poisson_gsrb_pm(size_t N, float TOL, size_t* ITER) {
+float* poisson_gsrb_parallel(size_t N, float TOL, size_t* ITER) {
     float* w = malloc(sizeof(float) * N * N);
-    parallel_populate_matrix(N, w);
-    float* u = malloc(sizeof(float) * N * N);
-
-    float DIFF = TOL + 1;
-    size_t iter = 0;
-    for (; DIFF > TOL; ++iter) {
-        // store last iteration in u
-        memcpy(u, w, sizeof(float) * N * N);
-
-        // update red points
-        for (size_t i = 1; i < N - 1; ++i) {
-            for (size_t j = 1 + (i % 2); j < N - 1; j += 2) {
-                w[I(N, i, j)] = (w[I(N, i - 1, j)] + w[I(N, i, j - 1)] + w[I(N, i, j + 1)] +
-                                 w[I(N, i + 1, j)]) /
-                                4;
-            }
-        }
-
-        // update black points
-        for (size_t i = 1; i < N - 1; ++i) {
-            for (size_t j = 1 + ((i + 1) % 2); j < N - 1; j += 2) {
-                w[I(N, i, j)] = (w[I(N, i - 1, j)] + w[I(N, i, j - 1)] + w[I(N, i, j + 1)] +
-                                 w[I(N, i + 1, j)]) /
-                                4;
-            }
-        }
-
-        DIFF = fabs(w[0] - u[0]);
-        for (size_t i = 1; i < N * N; ++i) {
-            float n = fabs(w[i] - u[i]);
-            DIFF = (DIFF < n) ? n : DIFF;
-        }
-    }
-
-    free(u);
-
-    *ITER = iter;
-    return w;
-}
-
-float* parallel_poisson_gsrb_pm(size_t N, float TOL, size_t* ITER) {
-    float* w = malloc(sizeof(float) * N * N);
-    parallel_populate_matrix(N, w);
+    populate_matrix(N, w);
     float* u = malloc(sizeof(float) * N * N);
 
     float DIFF = TOL + 1;
@@ -376,57 +303,9 @@ float* poisson_sorrb(size_t N, float TOL, size_t* ITER) {
     return w;
 }
 
-float* poisson_sorrb_pm(size_t N, float TOL, size_t* ITER) {
+float* poisson_sorrb_parallel(size_t N, float TOL, size_t* ITER) {
     float* w = malloc(sizeof(float) * N * N);
-    parallel_populate_matrix(N, w);
-    float* u = malloc(sizeof(float) * N * N);
-
-    float p = 2.0f / (1.0f + sinf(M_PI / (N - 1)));
-
-    float DIFF = TOL + 1;
-    size_t iter = 0;
-    for (; DIFF > TOL; ++iter) {
-        // store last iteration in u
-        memcpy(u, w, sizeof(float) * N * N);
-
-        // update red points
-        for (size_t i = 1; i < N - 1; ++i) {
-            for (size_t j = 1 + (i % 2); j < N - 1; j += 2) {
-                w[I(N, i, j)] =
-                    (1 - p) * w[I(N, i, j)] + p *
-                                                  (w[I(N, i - 1, j)] + w[I(N, i, j - 1)] +
-                                                   w[I(N, i, j + 1)] + w[I(N, i + 1, j)]) /
-                                                  4;
-            }
-        }
-
-        // update black points
-        for (size_t i = 1; i < N - 1; ++i) {
-            for (size_t j = 1 + ((i + 1) % 2); j < N - 1; j += 2) {
-                w[I(N, i, j)] =
-                    (1 - p) * w[I(N, i, j)] + p *
-                                                  (w[I(N, i - 1, j)] + w[I(N, i, j - 1)] +
-                                                   w[I(N, i, j + 1)] + w[I(N, i + 1, j)]) /
-                                                  4;
-            }
-        }
-
-        DIFF = fabs(w[0] - u[0]);
-        for (size_t i = 1; i < N * N; ++i) {
-            float n = fabs(w[i] - u[i]);
-            DIFF = (DIFF < n) ? n : DIFF;
-        }
-    }
-
-    free(u);
-
-    *ITER = iter;
-    return w;
-}
-
-float* parallel_poisson_sorrb_pm(size_t N, float TOL, size_t* ITER) {
-    float* w = malloc(sizeof(float) * N * N);
-    parallel_populate_matrix(N, w);
+    populate_matrix(N, w);
     float* u = malloc(sizeof(float) * N * N);
 
     float p = 2.0f / (1.0f + sinf(M_PI / (N - 1)));
@@ -489,23 +368,20 @@ void run_test(
     float* img = f(N, TOL, ITER);
     end = clock();
     to_image(filename, N, img);
-    printf("created %s: %f sec\n", filename, ((double) (end - start) / CLOCKS_PER_SEC));
+    printf("%s  \t%zu iter\t%f sec\n", filename, *ITER, ((double) (end - start) / CLOCKS_PER_SEC));
     free(img);
 }
 
 int main(void) {
-    size_t N = 2000;
+    size_t N = 200;
     float TOL = 0.02;
     size_t ITER;
     run_test(poisson_gs, N, TOL, &ITER, "poisson_gs.ppm");
-    run_test(poisson_gs_pm, N, TOL, &ITER, "poisson_gs_pm.ppm");
-    run_test(poisson_gs_parallel, N, TOL, &ITER, "poisson_gs.ppm");
-
+    run_test(poisson_gs_parallel, N, TOL, &ITER, "poisson_gs_par.ppm");
+    puts("");
     run_test(poisson_gsrb, N, TOL, &ITER, "poisson_gsrb.ppm");
-    run_test(poisson_gsrb_pm, N, TOL, &ITER, "poisson_gsrb_pm.ppm");
-    run_test(parallel_poisson_gsrb_pm, N, TOL, &ITER, "parallel_poisson_gsrb_pm.ppm");
-
+    run_test(poisson_gsrb_parallel, N, TOL, &ITER, "poisson_gsrb_par.ppm");
+    puts("");
     run_test(poisson_sorrb, N, TOL, &ITER, "poisson_sorrb.ppm");
-    run_test(poisson_sorrb_pm, N, TOL, &ITER, "poisson_sorrb_pm.ppm");
-    run_test(parallel_poisson_sorrb_pm, N, TOL, &ITER, "parallel_poisson_sorrb_pm.ppm");
+    run_test(poisson_sorrb_parallel, N, TOL, &ITER, "poisson_sorrb_par.ppm");
 }
