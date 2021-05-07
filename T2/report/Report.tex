@@ -1,0 +1,196 @@
+\documentclass[a4paper]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[portuguese]{babel}
+\usepackage{hyperref}
+\usepackage{a4wide}
+\hypersetup{pdftitle={AP - Poisson},
+pdfauthor={João Teixeira, José Ferreira},
+colorlinks=true,
+urlcolor=blue,
+linkcolor=black}
+\usepackage{subcaption}
+\usepackage{listings}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{appendix}
+\usepackage{tikz}
+\usepackage{authblk}
+\usepackage{bashful}
+\usepackage{verbatim}
+\usepackage{amssymb}
+\usepackage{multirow}
+\usepackage{mwe}
+\usepackage[parfill]{parskip}
+\usetikzlibrary{positioning,automata,decorations.markings}
+\AfterEndEnvironment{figure}{\noindent\ignorespaces}
+\AfterEndEnvironment{table}{\noindent\ignorespaces}
+
+\begin{document}
+
+\title{Algoritmos Paralelos\\Numerical Solution of the Poisson Equation}
+\author{João Teixeira (A85504) \and José Filipe Ferreira (A83683)}
+\date{\today}
+
+\begin{center}
+    \begin{minipage}{0.75\linewidth}
+        \centering
+        \includegraphics[width=0.4\textwidth]{images/eng.jpeg}\par\vspace{1cm}
+        \vspace{1.5cm}
+        \href{https://www.uminho.pt/PT}
+        {\color{black}{\scshape\LARGE Universidade do Minho}} \par
+        \vspace{1cm}
+        \href{https://www.di.uminho.pt/}
+        {\color{black}{\scshape\Large Departamento de Informática}} \par
+        \vspace{1.5cm}
+        \maketitle
+    \end{minipage}
+\end{center}
+
+\tableofcontents
+
+\pagebreak
+
+\chapter{Introdução}
+A equação de Poisson é usada nas áreas das ciências naturais e da física
+teórica. A solução desta equação pode ser usada para, por exemplo, simular os
+campos electromagnéticos gerados por partículas electricamente carregadas. Esta
+é uma generalização da equação de Laplace que também tem múltiplos usos na
+física teórica.
+
+A formulação desta equação a duas dimensões e dada por:
+
+\[ \left( \frac{\partial^2 u}{\partial x^2} + \frac{\partial^2 u}{\partial y^2} \right)= g(x, y) \]
+
+Para simplificar assume-se que g(x,y) = 0 sendo que u representa o limite da
+área. Os valores da solução não são computados de forma continua mas sim de
+forma discreta.
+
+Ao longo deste relatório iremos descrever os vários algoritmos iterativos
+desenvolvidos em C com o objetivo de aproximar a solução desta equação assim
+como a estratégia de paralelização utilizada com vista a melhorar a performance
+dos mesmos culminando numa analise de tempos de execução.
+
+\chapter{Algoritmos Desenvolvidos}
+
+Foram desenvolvidos três algoritmos iterativos distintos para resolver este
+problema. Gauss-Seidel, Gauss-Seidel com Red-Black e Successive Overrelaxation
+com Red-Black.
+
+Todos os algoritmos recebem como parâmetro o tamanho do vetor a resolver e o
+valor de tolerância e devolvem o vetor com os valores aproximados e o numero de
+iterações que tiveram de ocorrer para calcular esse valor.
+
+O vetor que contem o que foi calculado até ao momento denomina-se de w e o vetor
+que contem o que foi calculado na iteração anterior denomina-se de u. O vetor w
+é populado no inicio com todos os valores na borda com o valor 100, menos na
+borda superior em que os valores são 0, e com os valores interiores iguais a 50.
+
+Numa primeira tentativa de melhorar a performance do algoritmo, paralelizou-se o
+ato de popular a matriz. Visto que o algoritmo inicial já vetorizava
+
+Para todos os algoritmos o caso de paragem consiste em subtrair o vetor w com o
+u e procurar qual é o valor maior em modulo. Esse modulo é comparado com o valor
+de tolerância passado por argumento. Caso o valor de tolerância seja maior do
+que o valor calculado então o algoritmo iterativo  acaba.
+
+Desta forma, a única diferença entre estes algoritmos na sua forma sequencial
+encontra-se na forma como eles percorrem e calculam o vetor w em cada iteração.
+
+\section{Gauss-Seidel}
+
+O algoritmo de Gauss-Seidel consiste em percorrer todos os pontos do vetor w
+linha por linha. Para cada ponto soma-se o ponto que está diretamente acima, o
+ponto abaixo, o ponto à esquerda e o ponto à direita e divide-se o resultado por
+4. Desta forma o valor do ponto é substituído pela média dos pontos diretamente
+adjacentes.
+
+% TODO explicar paralelização
+
+\section{Gauss-Seidel com Red-Black}
+
+Tal como se viu o algoritmo de Gauss-Seidel simples não é fácil de
+paralelizar. Por isso, foi criado uma versão modificada do algoritmo que
+percorre o vetor w de forma diferente para tentar mitigar este problema.
+
+O método utilizado de percorrer o vetor é conhecido como Red-Black porque o
+resultado se assemelha a um tabuleiro de xadrez com as casas de cor vermelha e
+preta. Dentro de cada iteração primeiro percorre-se posição sim posição não de
+cada linha par e posição não posição sim de cada linha par (células vermelhas da
+imagem \ref{fig:chess}) e depois percorre-se posição não posição sim de cada
+linha par e posição sim posição não de cada linha ímpar (células pretas da
+imagem \ref{fig:chess}). Em cada iteração, para cada uma das posições do vetor w
+o novo valor é dado na mesma por calcular a média dos pontos diretamente
+adjacentes
+
+\begin{figure}[h]
+    \centering
+        \includegraphics[width=0.4\textwidth]{images/chess.jpg}
+        \caption{tabuleiro de xadrez}
+        \label{fig:chess}
+\end{figure}
+
+Desta forma cada uma destas duas passagens dentro de cada iteração não tem
+dependências de dados dentro de si mesmas.
+
+% TODO explicar paralelização
+
+\section{Successive Overrelaxation com Red-Black}
+
+A versão sequencial deste algoritmo é muito próxima da versão sequencial do
+algoritmo Gauss-Seidel com Red-Black.
+
+% TODO explicar paralelização
+
+\chapter{Representação de Resultados}
+
+Para representar os resultados obtidos pelos algoritmos criados, foi feita uma
+função que representa o vetor w sobre a forma de uma imagem no formato
+\textit{portable pixmap format} (PPM). Este formato foi escolhido devido ao
+facto de suportar formato ASCII tornando a escrita da imagem substancialmente
+mais simples. O formato indica que existem duas áreas no ficheiro. Uma primeira
+área que indica o formato utilizado e uma segunda área com os pontos
+propriamente ditos.
+
+A área do formato contem três linhas. A primeira linha representa o formato em
+que a imagem foi escrita. Neste caso o formato escolhido foi o formato P3 que
+indica que a imagem está escrita em ASCII e que representa pontos RGB. A segunda
+linha indica as dimensões da imagem separada por espaço. Por fim, a ultima linha
+representa o valor máximo de cada valor de cor. Neste caso o valor escolhido
+foi 255.
+
+A área com os pontos propriamente ditos contem um ponto por linha. Sendo que
+cada linha contem o valor R, o valor G e o valor B do pixel separado por espaços.
+
+Desta forma, para representar uma imagem com apenas um pixel branco basta fazer:
+\begin{verbatim}
+P3
+1 1
+255
+255 255 255
+\end{verbatim}
+
+Para representar os pontos do vetor estes são primeiro convertidos para HSV.
+Neste passo a Saturação e Valor são sempre mantidos constantes para todos os
+pontos, sendo que o único valor que varia é o Hue. Para existir uma variação
+constante de azul para amarelo com o aumento dos valores é necessário que o Hue
+varie entre 60 e 240. O próximo passo consiste em converter os valores dentro do
+vetor w para estarem contidos dentro desse intervalo. Por fim pode-se converter
+o HSV obtido para RGB e colocar no ficheiro.
+
+\begin{figure}[h]
+\centering
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.95\linewidth]{images/eng.jpeg}
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.95\linewidth]{images/eng.jpeg}
+\end{minipage}
+    \caption{Comparação de diferentes valores para Tmin e Tdecay em Monte-Carlo com annealing}
+\end{figure}
+
+\chapter{Analize de Resultados}
+
+
+\end{document}
