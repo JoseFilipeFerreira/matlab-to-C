@@ -1,4 +1,4 @@
-# AP
+# Matlab to C
 
 Rewriting implementations of problems in Matlab to C (Parallel algorithms assignment)
 
